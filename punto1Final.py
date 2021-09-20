@@ -115,7 +115,7 @@ for i in range(len(procesos)):
         if procesos[i]["tamaño"]<=MaximoLugarDisponible(memori[j]["espacio"])[0] and memori[j]["libre"]:
             RellenarParticion(memori[j]["espacio"],MaximoLugarDisponible(memori[j]["espacio"])[1],procesos[i]["nombre"],procesos[i]["tamaño"])
             memori[j]["libre"]=False
-            procesos[i]["idp"]=MaximoLugarDisponible(memori[j]["espacio"])[1]
+            procesos[i]["idp"]=id(memori[j]["espacio"][0])
             procesos[i]["tamp"]=len(memori[j]["espacio"])
             procesos[i]["usado"]=True
             break            
