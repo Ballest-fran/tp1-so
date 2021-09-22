@@ -74,7 +74,21 @@ print(a)"""
 """e=False
 if not e:
   print("funciona")"""
+#prueba de tiempo
+"""import time
+print("vendra un mensaje despues de 1.9 segundos")
+time.sleep(1.9)
+print("hola")
+segund=time.time()
+print(segund)
 
-for i in range(4):
-  print(i)
-  break
+while segund!=segund+10:
+  break"""
+
+a,b=[3,4]
+print(a)
+print(b)
+
+a=[1,2,4,5,6]
+a=[None]*len(a)
+print(a)
