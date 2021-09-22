@@ -77,7 +77,7 @@ if not e:
 #prueba de tiempo
 """import time
 print("vendra un mensaje despues de 1.9 segundos")
-time.sleep(1.9)
+time.s☺leep(1.9)
 print("hola")
 segund=time.time()
 print(segund)
@@ -89,6 +89,14 @@ a,b=[3,4]
 print(a)
 print(b)
 
-a=[1,2,4,5,6]
-a=[None]*len(a)
+a=[3,4,3,5]
 print(a)
+del a[2]
+print(a)
+for i in a:
+  print(i)
+
+
+a=list()
+if a==[]:
+  print("funciona")

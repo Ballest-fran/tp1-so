@@ -16,6 +16,7 @@ def menu():
 
 # op mostrar procesos
 # op nuevo proceso
+#       verificar que los datos del proceso no exedan o den error en el proceso
 # op salir/comenzar proceso
 
 #aca creamos la particion
@@ -26,6 +27,7 @@ def Particion(nomb,cant):
     a["nombre"] = nomb
     a["espacio"] = l
     a["libre"] = True
+    a["DuracionDePro"] = None
     return a
 
 #funcion para crear las particiones en una lista y la devolverla
@@ -99,11 +101,24 @@ def MostarProcesos(listP):
 
 def CrearProcesos():
     p=list()
-    p.append(Proceso("P1",25))
-    p.append(Proceso("P1'",75))
-    p.append(Proceso("p2",150))
-    p.append(Proceso("P3",250))
-    
+    p.append(Proceso("P1",75))
+    p[0]["tdarr"]=0
+    p[0]["tdirr"]=2
+    p.append(Proceso("P2",25))
+    p[1]["tdarr"]=0
+    p[1]["tdirr"]=3
+    p.append(Proceso("p3",150))
+    p[2]["tdarr"]=7
+    p[2]["tdirr"]=6
+    """ 
+    p.append(Proceso("P4",250))
+    p[3]["tdarr"]=2
+    p[3]["tdirr"]=7
+    p.append(Proceso("P5",250))
+    p[4]["tdarr"]=3
+    p[4]["tdirr"]=8
+    """
+
     return p
 
 def IniciarSO(me):
@@ -119,11 +134,12 @@ def IniciarSO(me):
 def MostrarTabla(pro):
     pass
 
-def CargarProcesosPosibles(proc,memo,proYa):
+def CargarProcesosPosibles(proc,memo,proYa,tg):
     proFalt=list()
     for i in range(len(proc)):
         for j in range(len(memo)):
             if proc[i]["tamaño"]<=len(memo[j]["espacio"]) and memo[j]["libre"]:
+                memo[j]["DuracionDePro"]=TiempoDeIrrupcion(memo,proc[i],tg)
                 RellenarParticion(memo[j]["espacio"],0,proc[i]["nombre"],proc[i]["tamaño"])
                 memo[j]["libre"]=False
                 proc[i]["idp"]=id(memo[j]["espacio"][0])
@@ -139,6 +155,27 @@ def CargarProcesosPosibles(proc,memo,proYa):
 def LiberarParticion(part):
     part["libre"]=True
     part["espacio"]=[None]*len(part["espacio"])
+    part["DuracionDePro"] = None
+
+
+def TiempoDeIrrupcion(memAc,Elproc,Tg):
+    c=0
+    ban=True
+    for x in range(len(memAc)):
+        if memAc[x]["DuracionDePro"]!=None:
+             c= c + memAc[x]["DuracionDePro"]
+             ban=False
+    c=Elproc["tdirr"]+c
+    if ban:
+        c=Elproc["tdirr"]+Tg
+    return c
+
+def ExisteProcesoEnMemoria(mem):
+    for x in range(len(mem)):
+        if mem[x]["DuracionDePro"]!=None:
+            return True
+    return False
+
 
 #                                    programa General
 memori=CrearMemoria()
@@ -147,17 +184,51 @@ memori=CrearMemoria()
 memori= sorted(memori, key=lambda Tpart : Tpart["espacio"])
 IniciarSO(memori)
 #MostrarMemoriaActual(memori)
-procesosDisponibles=CrearProcesos()     #lista de procesos por procesar
+procesos=CrearProcesos()                #Todos los procesos            
+colaDeProcesos=list()                   #lista de procesos listos para cargar
 procesosCargados=list()                 #lista de procecos procesados xd
+MostarProcesos(procesos)
 
-procesosDisponibles=CargarProcesosPosibles(procesosDisponibles,memori,procesosCargados)
+t=0
+while len(procesos)!=0 or ExisteProcesoEnMemoria(memori):
+    a=list()
+    cambioM=False
+    print(f"Tiempo = - {t} -")
+    
+    for i in range(len(procesos)):
+        if t == procesos[i]["tdarr"]:
+            print("cargo el proceso", procesos[i]["nombre"] ," a la cola de procesos")
+            colaDeProcesos.append(procesos[i])
+            print("borramos el proceso", procesos[i]["nombre"] ," de procesos generales")
+            a.append(i)
+    a.sort(reverse=True)
+    
+    for i in a:
+        del procesos[i] 
+    
+    #cargar en memoria
+    for i in range(len(colaDeProcesos)):
+        if colaDeProcesos!=[] and colaDeProcesos[i]["tdarr"] <= t:
+            colaDeProcesos=CargarProcesosPosibles(colaDeProcesos,memori,procesosCargados,t)
+            cambioM=True
+        
+    for i in range(len(memori)):
+        if memori[i]["DuracionDePro"] == t:
+            print("el proceso de la particion ", memori[i]["nombre"] ,"-Termino- sale de memoria")
+            LiberarParticion(memori[i])
+            cambioM=True
+    
+    if cambioM:
+        MostrarMemoriaActual(memori) 
+    t=t+1
+
+    
+
+
+print(colaDeProcesos)
+print(a)
 MostrarMemoriaActual(memori)
-
+print(colaDeProcesos)
 print(procesosCargados)
-print("-------------------------------------------------------------------------------")
-print(procesosDisponibles)
-
-
-
-
-
+for i in memori:
+    print(i["DuracionDePro"])
