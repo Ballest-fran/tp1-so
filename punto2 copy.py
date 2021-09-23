@@ -204,7 +204,9 @@ memori=CrearMemoria()
                         #ordenar las particiones de menor a mayor tamaño de memoria, ESTO ordenan los areglos pero solo si estan bacios
 memori= sorted(memori, key=lambda Tpart : Tpart["espacio"])
 IniciarSO(memori)                       #reserva la particion del sistema operativo
-procesos=CrearProcesos()                #Todos los procesos            
+
+
+procesos=Menu()               #Todos los procesos            
 colaDeProcesos=list()                   #lista de procesos listos para cargar
 procesosCargados=list()                 #lista de procecos procesados xd
 
@@ -214,40 +216,4 @@ procesosCargados=list()                 #lista de procecos procesados xd
 
 print("*****TODOS LOS PROCESOS*****")
 MostarProcesos(procesos)
-t=0     #Inicia el tiempo retorico
-while len(procesos)!=0 or ExisteProcesoEnMemoria(memori):
-    a=list()        #esta lista es un indice para eliminar los procesos
-    cambioM=False   #si detecta un cambio en la memoria se pone a true
-    print(f"Tiempo = - {t} -")
-    
-    for i in range(len(procesos)):
-        if t == procesos[i]["tdarr"]:
-            print("cargo el proceso", procesos[i]["nombre"] ," a la cola de procesos")
-            colaDeProcesos.append(procesos[i])
-            print("borramos el proceso", procesos[i]["nombre"] ," de procesos generales")
-            a.append(i)
-    a.sort(reverse=True)
-    #elimina los procesos 
-    for i in a:
-        del procesos[i] 
-    
-    #cargar en memoria
-    for i in range(len(colaDeProcesos)):
-        if colaDeProcesos!=[] and colaDeProcesos[i]["tdarr"] <= t:
-            colaDeProcesos=CargarProcesosPosibles(colaDeProcesos,memori,procesosCargados,t)
-            cambioM=True
-    #saca de memoria los proocesos segun el tiempo
-    for i in range(len(memori)):
-        if memori[i]["DuracionDePro"] == t:
-            print("el proceso de la particion ", memori[i]["nombre"] ,"-Termino- sale de memoria")
-            LiberarParticion(memori[i])
-            cambioM=True
-    
-    if cambioM:
-        MostrarMemoriaActual(memori) 
-    t=t+1
 
-    
-
-print("*****PROCESOS finalizados*****")
-MostarProcesos(procesosCargados)
