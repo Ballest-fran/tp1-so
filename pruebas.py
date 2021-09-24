@@ -61,15 +61,17 @@ for i in range(len(l)):
     c=0
 print(c)"""
 
-"""
+
 l=list()
 l=[1]*3
 a={
   1:l
 }
-a[2]=id(a)
-
-print(a)"""
+b=dict()
+b=a
+b[1][0]=100
+print(a)
+print(b)
 
 """e=False
 if not e:
@@ -85,7 +87,7 @@ print(segund)
 while segund!=segund+10:
   break"""
 
-a,b=[3,4]
+"""a,b=[3,4]
 print(a)
 print(b)
 
@@ -99,4 +101,26 @@ for i in a:
 
 a=list()
 if a==[]:
-  print("funciona")
+  print("funciona")"""
+
+"""def Particion(nomb,cant):
+  l=list()
+  l=[None]*cant
+  a=dict()
+  a["nombre"] = nomb
+  a["espacio"] = l
+  a["libre"] = True
+  a["DuracionDePro"] = None
+  a["idcomienzo"] = id(a["espacio"][0])
+  a["id"] = id(a)
+  a["idproc"] = None
+  a["fragmentI"] = None
+  return a
+
+b=Particion("p1",50)
+print(b["id"])
+print(b["idcomienzo"])
+b["espacio"][0]=1
+print(b["id"])
+print(b["idcomienzo"])"""
+

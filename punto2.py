@@ -14,6 +14,7 @@ Mostrar la información anterior por cada proceso ingresado en la tabla de parti
 def Menu():
     futproces=list()
     while True:
+        print()
         print("--->Ingrese '1' para mostrar los proces ya cargados")
         print("--->Ingrese '2' para ingresar un nuevo proceso")
         print("--->Ingrese CUALQUIER LETRA para SALIR/COMENZAR PROCESO")
@@ -30,7 +31,7 @@ def Menu():
             x[0]=input("ingrese el nombre del proceso (Tratar de que no sea muy largo): ")
             x[1]=int(input("ingrese el tamaño que ocupara en memoria: "))#deveriamos hacer una previa verificacion de memoria aqui
             x=Proceso(x[0],x[1])
-            x["tdarr"]=int(input("ingrese el tiempo de arrupcion del procesos: "))
+            x["tdarr"]=int(input("ingrese el tiempo de arribo del procesos: "))
             x["tdirr"]=int(input("ingrese el tiempo de irrupcion del procesos: "))
             futproces.append(x)
         else:
@@ -50,6 +51,10 @@ def Particion(nomb,cant):
     a["espacio"] = l
     a["libre"] = True
     a["DuracionDePro"] = None
+    a["idcomienzo"] = id(a["espacio"][0])
+    a["id"] = id(a)
+    a["idproc"] = None
+    a["fragmentI"] = None
     return a
 
 #funcion para crear las particiones en una lista y la devolverla
@@ -84,7 +89,7 @@ def RellenarParticion(part,desde,dato,cant):
 #devuelve la max cantidad de lugarases continuos de la memoria libre en el [0] 
 #y el lugar donde empieza a estar libre esa maxima cantidad en el [1]
 #  , pasando como parametro la lista de la particion
-def MaximoLugarDisponible(part):
+def MaximoLugarDisponible(part):#resive como parametro una lista de valores simples
     c=0
     l=0
     b=True
@@ -97,7 +102,7 @@ def MaximoLugarDisponible(part):
         else:
             c=0
             b=True
-    return c,l
+    return c,l      #c=cantidad de lugares  -- l=es el lugar donde empieza a estar libre
 
 def Proceso(nombre,tamaño):
     a=dict()
@@ -151,9 +156,16 @@ def IniciarSO(me):
                 me[i]["libre"] = False
                 ban=False
 
-#Nombre del proceso-----id de proceso-----id de inicio de la particion asignada-----tamaño de la particon asignada
-def MostrarTabla(pro):
-    pass
+#Nombre de la particion-----id de la particion-----id del comienzo de la particion-----id del proceso asignado a la particion -----fragmentacion interna
+def MostrarTablaPart(partic):
+    print("----*****TABLA DE PARTICIONES*****----")
+    print("-------------------------------------------------------------------------------")
+    print("| Nombre  | id particion | id comienzo |   id proceso asig.  |  Fragmentacion interna |")
+    print("-------------------------------------------------------------------------------")
+    for i in range(len(partic)):
+        print("|",partic[i]["nombre"],"|",partic[i]["id"],"|",partic[i]["idcomienzo"],"|",partic[i]["idproc"],"|",partic[i]["fragmentI"],"|")
+        print("-------------------------------------------------------------------------------") 
+
 
 def CargarProcesosPosibles(proc,memo,proYa,tg):
     proFalt=list()
@@ -167,6 +179,13 @@ def CargarProcesosPosibles(proc,memo,proYa,tg):
                 proc[i]["tamp"]=len(memo[j]["espacio"])
                 proc[i]["usado"]=True
                 proYa.append(proc[i]) 
+                memo[j]["idproc"] = id(proc[i])
+                memo[j]["fragmentI"] = MaximoLugarDisponible(memo[j]["espacio"])[0]
+                #1-parte de la tabla final
+                dAx=dict(memo[j])
+                listaParaTabla.append(dAx)
+                listaParaTabla[-1]["espacio"]=len(listaParaTabla[-1]["espacio"])
+                #1-
                 break            
         if not proc[i]["usado"]:
             proFalt.append(proc[i]) #agrego el proceso que no fue cargado a la memoria
@@ -177,7 +196,9 @@ def LiberarParticion(part):
     part["libre"]=True
     part["espacio"]=[None]*len(part["espacio"])
     part["DuracionDePro"] = None
-
+    part["idproc"] = None
+    part["fragmentI"] = None
+    
 
 def TiempoDeIrrupcion(memAc,Elproc,Tg):
     c=0
@@ -203,12 +224,17 @@ def ExisteProcesoEnMemoria(mem):
 memori=CrearMemoria()
                         #ordenar las particiones de menor a mayor tamaño de memoria, ESTO ordenan los areglos pero solo si estan bacios
 memori= sorted(memori, key=lambda Tpart : Tpart["espacio"])
-IniciarSO(memori)                       #reserva la particion del sistema operativo
-procesos=CrearProcesos()                #Todos los procesos            
+IniciarSO(memori)                       #reserva la particion del sistema operativo            
 colaDeProcesos=list()                   #lista de procesos listos para cargar
 procesosCargados=list()                 #lista de procecos procesados xd
+#Todos los procesos
+listaParaTabla=list()       #variable global que se utiliza en CargarProcesosPosibles
 
-
+o=input("ingrese 1 para cargar procesos y CUALQUIER LETRA PARA USAR LOS YA CARGADOS: ")
+if o=="1":
+    procesos=Menu()  
+else:
+    procesos=CrearProcesos()
 
 
 
@@ -242,7 +268,7 @@ while len(procesos)!=0 or ExisteProcesoEnMemoria(memori):
             print("el proceso de la particion ", memori[i]["nombre"] ,"-Termino- sale de memoria")
             LiberarParticion(memori[i])
             cambioM=True
-    
+    #si quiero mostrar la memoria todo el tiempo borro el if. y dejo mostrarmemoria
     if cambioM:
         MostrarMemoriaActual(memori) 
     t=t+1
@@ -251,3 +277,5 @@ while len(procesos)!=0 or ExisteProcesoEnMemoria(memori):
 
 print("*****PROCESOS finalizados*****")
 MostarProcesos(procesosCargados)
+
+MostrarTablaPart(listaParaTabla)
